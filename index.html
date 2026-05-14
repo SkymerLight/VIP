@@ -3,132 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Calc • Staff</title>
+    <title>VIP Calc • Staff Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
+        :root {
+            --bg: #0a0a0b;
+            --card-bg: #111114;
+            --input-bg: #050505;
+            --accent: #00ff88;
+            --accent-glow: rgba(0, 255, 136, 0.3);
+            --text-main: #ffffff;
+            --text-dim: #666670;
+            --text-muted: #a0a0ab;
+        }
+
         body {
-            background-color: #0d0d0d;
-            color: #ffffff;
+            background-color: var(--bg);
+            color: var(--text-main);
             font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
 
         .card {
-            background: #161616;
-            padding: 40px;
+            background: var(--card-bg);
+            padding: 30px;
             border-radius: 24px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             width: 320px;
-            border: 1px solid #222;
-            transition: transform 0.3s ease;
+            border: 1px solid #1f1f23;
+            /* Ajuste para não cortar conteúdo */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .hoje {
-            color: #666;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
-        input {
+        input[type="date"] {
             width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            border: 2px solid #222;
-            background: #000;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #1f1f23;
+            background: var(--input-bg);
             color: #fff;
             font-size: 1rem;
-            margin-bottom: 25px;
             outline: none;
-            transition: 0.3s;
             cursor: pointer;
+            font-family: inherit;
+            box-sizing: border-box;
         }
 
-        input:focus { border-color: #00ff88; }
+        /* FORÇAR ÍCONE DO CALENDÁRIO A APARECER */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(1) brightness(0.8); /* Deixa o ícone branco/cinza */
+            padding: 5px;
+        }
 
-        .resultado { min-height: 120px; }
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
 
-        .label-faltam { color: #888; font-size: 0.9rem; font-weight: bold; }
+        .resultado {
+            min-height: 140px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.15);
+            border-radius: 16px;
+        }
+
+        .label-status {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
 
         .numero-dias {
-            display: block;
             font-size: 4.5rem;
             font-weight: 900;
-            color: #00ff88;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
-            margin: 5px 0;
-            animation: pop 0.3s ease-out;
+            color: var(--accent);
+            text-shadow: 0 0 20px var(--accent-glow);
+            line-height: 1;
+            margin: 10px 0;
         }
 
-        @keyframes pop {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        button {
-            background: #222;
-            border: none;
-            color: #aaa;
-            padding: 8px 15px;
+        .btn-copy {
+            background: #1f1f23;
+            border: 1px solid #2f2f35;
+            color: var(--text-muted);
+            padding: 8px 16px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.8rem;
-            margin-top: 10px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
             transition: 0.2s;
         }
 
-        button:hover { background: #333; color: #fff; }
+        .btn-copy:hover {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
 
-        .copy-success { color: #00ff88; font-size: 0.7rem; margin-top: 5px; display: none; }
+        #copyMsg {
+            color: var(--accent);
+            font-size: 0.65rem;
+            height: 15px;
+            margin-top: 5px;
+            opacity: 0;
+        }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="hoje">HOJE É: <span id="displayHoje"></span></div>
+    <div class="hoje">HOJE: <span id="displayHoje" style="color:var(--text-muted)"></span></div>
+    
     <input type="date" id="dataFim">
+
     <div class="resultado" id="res">
-        <span style="color: #444">Aguardando data...</span>
+        <span style="color: #333; font-size: 0.8rem; font-weight: 700;">ESCOLHA UMA DATA</span>
     </div>
+    
+    <div id="copyMsg">COPIADO!</div>
 </div>
 
 <script>
     const input = document.getElementById('dataFim');
     const res = document.getElementById('res');
     const hoje = new Date();
+    
     document.getElementById('displayHoje').innerText = hoje.toLocaleDateString('pt-BR');
 
     input.addEventListener('input', () => {
         if(!input.value) return;
+
         const [ano, mes, dia] = input.value.split('-');
         const dataFinal = new Date(ano, mes - 1, dia);
         const dataHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+        
         const diffDias = Math.ceil((dataFinal - dataHoje) / (1000 * 60 * 60 * 24));
 
         if (diffDias >= 0) {
             res.innerHTML = `
-                <span class="label-faltam">RESTAM</span>
-                <span class="numero-dias" id="num">${diffDias}</span>
-                <span class="label-faltam">DIAS</span><br>
-                <button onclick="copyToClipboard('${diffDias}')">COPIAR NÚMERO</button>
-                <div id="copyMsg" class="copy-success">Copiado!</div>
+                <span class="label-status">RESTAM</span>
+                <span class="numero-dias">${diffDias}</span>
+                <span class="label-status">DIAS</span>
+                <button class="btn-copy" onclick="copyToClipboard('${diffDias}')" style="margin-top:15px">Copiar</button>
             `;
         } else {
-            res.innerHTML = `<span style="color: #ff4444; font-weight: bold;">EXPIRADO HÁ ${Math.abs(diffDias)} DIAS</span>`;
+            res.innerHTML = `<span style="color: #ff4444; font-weight: 900;">EXPIRADO</span>`;
         }
     });
 
     function copyToClipboard(val) {
-        navigator.clipboard.writeText(val);
-        const msg = document.getElementById('copyMsg');
-        msg.style.display = 'block';
-        setTimeout(() => msg.style.display = 'none', 2000);
+        navigator.clipboard.writeText(val).then(() => {
+            const msg = document.getElementById('copyMsg');
+            msg.style.opacity = '1';
+            setTimeout(() => { msg.style.opacity = '0'; }, 2000);
+        });
     }
 </script>
 
