@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Dias VIP</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: #1e1e1e;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 300px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 20px 0;
+            border-radius: 6px;
+            border: 1px solid #333;
+            background: #252525;
+            color: white;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+        }
+        .resultado {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            min-height: 60px;
+        }
+        .numero-dias {
+            display: block;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00ff88; /* Verde Neon */
+        }
+        .hoje {
+            color: #888;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="hoje">Hoje é: <span id="displayHoje"></span></div>
+    <input type="date" id="dataFim">
+    <div class="resultado" id="res">Selecione a data final</div>
+</div>
+
+<script>
+    const input = document.getElementById('dataFim');
+    const res = document.getElementById('res');
+    
+    // Mostra a data de hoje formatada
+    const hoje = new Date();
+    document.getElementById('displayHoje').innerText = hoje.toLocaleDateString('pt-BR');
+
+    input.addEventListener('input', () => {
+        if(!input.value) return;
+
+        // Ajuste para evitar erro de fuso horário (Data local)
+        const [ano, mes, dia] = input.value.split('-');
+        const dataFinal = new Date(ano, mes - 1, dia);
+        
+        // Zera as horas de hoje para o cálculo ser exato por dia
+        const dataHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+
+        const diffMilissegundos = dataFinal - dataHoje;
+        const diffDias = Math.ceil(diffMilissegundos / (1000 * 60 * 60 * 24));
+
+        if (diffDias > 0) {
+            res.innerHTML = `Faltam:<br><span class="numero-dias">${diffDias}</span> dias`;
+        } else if (diffDias === 0) {
+            res.innerHTML = `<span style="color: #ffcc00">Expira HOJE</span>`;
+        } else {
+            res.innerHTML = `<span style="color: #ff4444">Vencido há ${Math.abs(diffDias)} dias</span>`;
+        }
+    });
+</script>
+
+</body>
+</html>
