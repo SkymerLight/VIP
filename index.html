@@ -3,91 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Dias VIP</title>
+    <title>VIP Calc • Staff</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
         body {
-            background-color: #121212;
+            background-color: #0d0d0d;
             color: #ffffff;
-            font-family: sans-serif;
+            font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
         }
+
         .card {
-            background-color: #1e1e1e;
-            padding: 2rem;
-            border-radius: 12px;
+            background: #161616;
+            padding: 40px;
+            border-radius: 24px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 300px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            width: 320px;
+            border: 1px solid #222;
+            transition: transform 0.3s ease;
         }
+
+        .hoje {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
         input {
             width: 100%;
-            padding: 12px;
-            margin: 20px 0;
-            border-radius: 6px;
-            border: 1px solid #333;
-            background: #252525;
-            color: white;
-            font-size: 1.1rem;
-            box-sizing: border-box;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #222;
+            background: #000;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 25px;
+            outline: none;
+            transition: 0.3s;
+            cursor: pointer;
         }
-        .resultado {
-            font-size: 1.2rem;
-            margin-top: 10px;
-            min-height: 60px;
-        }
+
+        input:focus { border-color: #00ff88; }
+
+        .resultado { min-height: 120px; }
+
+        .label-faltam { color: #888; font-size: 0.9rem; font-weight: bold; }
+
         .numero-dias {
             display: block;
-            font-size: 3rem;
-            font-weight: bold;
-            color: #00ff88; /* Verde Neon */
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+            margin: 5px 0;
+            animation: pop 0.3s ease-out;
         }
-        .hoje {
-            color: #888;
-            font-size: 0.9rem;
+
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
+
+        button {
+            background: #222;
+            border: none;
+            color: #aaa;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        button:hover { background: #333; color: #fff; }
+
+        .copy-success { color: #00ff88; font-size: 0.7rem; margin-top: 5px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="hoje">Hoje é: <span id="displayHoje"></span></div>
+    <div class="hoje">HOJE É: <span id="displayHoje"></span></div>
     <input type="date" id="dataFim">
-    <div class="resultado" id="res">Selecione a data final</div>
+    <div class="resultado" id="res">
+        <span style="color: #444">Aguardando data...</span>
+    </div>
 </div>
 
 <script>
     const input = document.getElementById('dataFim');
     const res = document.getElementById('res');
-    
-    // Mostra a data de hoje formatada
     const hoje = new Date();
     document.getElementById('displayHoje').innerText = hoje.toLocaleDateString('pt-BR');
 
     input.addEventListener('input', () => {
         if(!input.value) return;
-
-        // Ajuste para evitar erro de fuso horário (Data local)
         const [ano, mes, dia] = input.value.split('-');
         const dataFinal = new Date(ano, mes - 1, dia);
-        
-        // Zera as horas de hoje para o cálculo ser exato por dia
         const dataHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+        const diffDias = Math.ceil((dataFinal - dataHoje) / (1000 * 60 * 60 * 24));
 
-        const diffMilissegundos = dataFinal - dataHoje;
-        const diffDias = Math.ceil(diffMilissegundos / (1000 * 60 * 60 * 24));
-
-        if (diffDias > 0) {
-            res.innerHTML = `Faltam:<br><span class="numero-dias">${diffDias}</span> dias`;
-        } else if (diffDias === 0) {
-            res.innerHTML = `<span style="color: #ffcc00">Expira HOJE</span>`;
+        if (diffDias >= 0) {
+            res.innerHTML = `
+                <span class="label-faltam">RESTAM</span>
+                <span class="numero-dias" id="num">${diffDias}</span>
+                <span class="label-faltam">DIAS</span><br>
+                <button onclick="copyToClipboard('${diffDias}')">COPIAR NÚMERO</button>
+                <div id="copyMsg" class="copy-success">Copiado!</div>
+            `;
         } else {
-            res.innerHTML = `<span style="color: #ff4444">Vencido há ${Math.abs(diffDias)} dias</span>`;
+            res.innerHTML = `<span style="color: #ff4444; font-weight: bold;">EXPIRADO HÁ ${Math.abs(diffDias)} DIAS</span>`;
         }
     });
+
+    function copyToClipboard(val) {
+        navigator.clipboard.writeText(val);
+        const msg = document.getElementById('copyMsg');
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 2000);
+    }
 </script>
 
 </body>
