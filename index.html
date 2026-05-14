@@ -25,40 +25,24 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px; /* Margem de segurança para telas pequenas */
+            padding: 15px;
             box-sizing: border-box;
             background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
         }
 
         .card {
             background: var(--card-bg);
-            padding: 40px 30px;
-            border-radius: 30px;
+            padding: 30px 20px;
+            border-radius: 25px;
             text-align: center;
             width: 100%;
-            max-width: 400px; /* No PC não passa disso */
+            max-width: 380px; /* Largura ideal no PC */
             border: 1px solid #222;
             box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            transition: all 0.3s ease;
-        }
-
-        /* AJUSTE PARA MOBILE */
-        @media (max-width: 480px) {
-            .card {
-                padding: 30px 20px;
-                border-radius: 20px;
-            }
-            .num {
-                font-size: 4.5rem !important; /* Diminui um pouco o número no celular */
-            }
-            input[type="date"] {
-                font-size: 1.2rem !important; /* Aumenta o texto da data para facilitar o toque */
-                padding: 18px !important;
-            }
         }
 
         .hoje-status {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             letter-spacing: 2px;
             color: var(--text-dim);
             font-weight: 700;
@@ -66,83 +50,87 @@
             text-transform: uppercase;
         }
 
+        /* CORREÇÃO PARA MOBILE (TEXTO PRETO NO FUNDO PRETO) */
         input[type="date"] {
             width: 100%;
             padding: 15px;
-            border-radius: 15px;
+            border-radius: 12px;
             border: 2px solid #1a1a1e;
-            background: #000;
-            color: #fff;
-            font-size: 1rem;
+            background: #000 !important;
+            color: #ffffff !important; /* Força texto branco */
+            color-scheme: dark; /* Avisa o sistema que o site é dark */
+            font-size: 1.1rem;
             outline: none;
             cursor: pointer;
-            transition: 0.3s;
             box-sizing: border-box;
             font-family: inherit;
-            appearance: none; /* Remove estilos padrão do sistema */
+            display: block;
         }
 
         input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
-            opacity: 0.5;
-            cursor: pointer;
+            opacity: 0.6;
         }
 
-        input:focus { border-color: #444; }
-
         .display-container {
-            margin-top: 25px;
-            padding: 25px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 18px;
             border: 1px solid rgba(255,255,255,0.03);
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: var(--text-dim);
             letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .num {
-            font-size: 6rem;
+            font-size: 5rem;
             font-weight: 900;
-            line-height: 1;
-            margin: 10px 0;
-            transition: 0.3s;
+            line-height: 1.1;
+            margin: 5px 0;
         }
 
-        .color-safe { color: var(--accent-green); text-shadow: 0 0 25px rgba(0, 255, 136, 0.3); }
-        .color-warn { color: var(--accent-warn); text-shadow: 0 0 25px rgba(255, 204, 0, 0.3); }
-        .color-expired { color: var(--accent-error); text-shadow: 0 0 25px rgba(255, 68, 68, 0.3); }
+        @media (max-width: 400px) {
+            .num { font-size: 4rem; }
+        }
+
+        .color-safe { color: var(--accent-green); text-shadow: 0 0 20px rgba(0, 255, 136, 0.2); }
+        .color-warn { color: var(--accent-warn); text-shadow: 0 0 20px rgba(255, 204, 0, 0.2); }
+        .color-expired { color: var(--accent-error); text-shadow: 0 0 20px rgba(255, 68, 68, 0.2); }
 
         .btn-copy {
             background: #1a1a1e;
             border: 1px solid #333;
-            color: #999;
-            padding: 15px 30px;
+            color: #888;
+            padding: 14px;
             border-radius: 12px;
             cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-top: 20px;
-            transition: 0.2s;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 15px;
+            width: 100%;
             text-transform: uppercase;
-            width: 100%; /* Botão largo no celular fica melhor */
+            transition: 0.2s;
         }
 
-        .btn-copy:hover {
-            background: #fff;
-            color: #000;
-        }
-
-        #msgStatus {
-            margin-top: 10px;
+        .btn-copy:active { background: #fff; color: #000; }
+        
+        #msgInfo {
             font-size: 0.7rem;
+            color: var(--accent-green);
+            margin-top: 8px;
+            height: 10px;
             font-weight: bold;
-            height: 15px;
-            transition: 0.3s;
+            opacity: 0;
         }
     </style>
 </head>
@@ -156,11 +144,11 @@
     <div id="displayArea" style="display: none;">
         <div class="display-container">
             <div class="label" id="topLabel">RESTAM</div>
-            <div class="num" id="resultadoNum">0</div>
+            <div id="resultadoNum" class="num">0</div>
             <div class="label">DIAS</div>
         </div>
-        <button class="btn-copy" id="btnCopiar" onclick="copy()">Copiar Número</button>
-        <div id="msgStatus"></div>
+        <button class="btn-copy" onclick="copy()">Copiar Dias</button>
+        <div id="msgInfo">COPIADO!</div>
     </div>
 </div>
 
@@ -169,8 +157,7 @@
     const displayArea = document.getElementById('displayArea');
     const resultadoNum = document.getElementById('resultadoNum');
     const topLabel = document.getElementById('topLabel');
-    const btnCopiar = document.getElementById('btnCopiar');
-    const msgStatus = document.getElementById('msgStatus');
+    const msgInfo = document.getElementById('msgInfo');
 
     document.getElementById('dataAtual').innerText = new Date().toLocaleDateString('pt-BR');
 
@@ -182,7 +169,7 @@
         const hoje = new Date();
         hoje.setHours(0,0,0,0);
 
-        const diff = Math.ceil((dataFim - hoje) / (86400000));
+        const diff = Math.ceil((dataFim - hoje) / 86400000);
         
         displayArea.style.display = 'block';
         resultadoNum.innerText = Math.abs(diff);
@@ -203,12 +190,8 @@
 
     function copy() {
         navigator.clipboard.writeText(resultadoNum.innerText);
-        msgStatus.innerText = "NÚMERO COPIADO!";
-        msgStatus.style.color = "#00ff88";
-        
-        setTimeout(() => {
-            msgStatus.innerText = "";
-        }, 2000);
+        msgInfo.style.opacity = '1';
+        setTimeout(() => msgInfo.style.opacity = '0', 1500);
     }
 </script>
 
