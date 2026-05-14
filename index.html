@@ -25,7 +25,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px; /* Margem de segurança para telas pequenas */
+            padding: 20px;
             box-sizing: border-box;
             background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
         }
@@ -36,24 +36,28 @@
             border-radius: 30px;
             text-align: center;
             width: 100%;
-            max-width: 400px; /* No PC não passa disso */
+            max-width: 400px;
             border: 1px solid #222;
             box-shadow: 0 30px 60px rgba(0,0,0,0.8);
             transition: all 0.3s ease;
         }
 
-        /* AJUSTE PARA MOBILE */
         @media (max-width: 480px) {
             .card {
                 padding: 30px 20px;
                 border-radius: 20px;
             }
             .num {
-                font-size: 4.5rem !important; /* Diminui um pouco o número no celular */
+                font-size: 4.5rem !important;
+            }
+            input[type="date"], .custom-placeholder {
+                font-size: 1.1rem !important;
             }
             input[type="date"] {
-                font-size: 1.2rem !important; /* Aumenta o texto da data para facilitar o toque */
                 padding: 18px !important;
+            }
+            .custom-placeholder {
+                left: 20px !important; /* Ajuste para acompanhar o padding maior no mobile */
             }
         }
 
@@ -64,6 +68,12 @@
             font-weight: 700;
             margin-bottom: 25px;
             text-transform: uppercase;
+        }
+
+        /* TRUQUE DEFINITIVO PARA O MOBILE */
+        .input-wrapper {
+            position: relative;
+            width: 100%;
         }
 
         input[type="date"] {
@@ -82,15 +92,30 @@
             color-scheme: dark; 
         }
 
-        /* FORÇA O TEXTO A APARECER NO MOBILE (WEBKIT) */
-        input[type="date"]::-webkit-datetime-edit {
-            color: #fff;
+        /* 1. Deixa o texto nativo "bugado" do celular invisível quando vazio */
+        input[type="date"]:invalid::-webkit-datetime-edit {
+            color: transparent;
         }
-        
-        input[type="date"]::-webkit-datetime-edit-text,
-        input[type="date"]::-webkit-datetime-edit-month-field,
-        input[type="date"]::-webkit-datetime-edit-day-field,
-        input[type="date"]::-webkit-datetime-edit-year-field {
+
+        /* 2. Cria o nosso próprio placeholder que funciona em qualquer tela */
+        .custom-placeholder {
+            position: absolute;
+            left: 17px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888; /* Cor cinza simulando o placeholder */
+            pointer-events: none; /* Permite que o clique atravesse o texto e abra o calendário */
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        /* 3. Esconde o nosso texto customizado quando uma data é escolhida */
+        input[type="date"]:valid + .custom-placeholder {
+            display: none;
+        }
+
+        /* 4. Força a data escolhida a aparecer na cor branca */
+        input[type="date"]:valid::-webkit-datetime-edit {
             color: #fff;
         }
 
@@ -140,7 +165,7 @@
             margin-top: 20px;
             transition: 0.2s;
             text-transform: uppercase;
-            width: 100%; /* Botão largo no celular fica melhor */
+            width: 100%;
         }
 
         .btn-copy:hover {
@@ -162,7 +187,10 @@
 <div class="card">
     <div class="hoje-status">STAFF PANEL • <span id="dataAtual"></span></div>
     
-    <input type="date" id="dataFim">
+    <div class="input-wrapper">
+        <input type="date" id="dataFim" required>
+        <span class="custom-placeholder">dd/mm/aaaa</span>
+    </div>
 
     <div id="displayArea" style="display: none;">
         <div class="display-container">
@@ -186,7 +214,10 @@
     document.getElementById('dataAtual').innerText = new Date().toLocaleDateString('pt-BR');
 
     input.addEventListener('input', () => {
-        if(!input.value) return;
+        if(!input.value) {
+            displayArea.style.display = 'none';
+            return;
+        }
         
         const [ano, mes, dia] = input.value.split('-');
         const dataFim = new Date(ano, mes - 1, dia);
