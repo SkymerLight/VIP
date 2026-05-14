@@ -3,183 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Calc • Staff Edition</title>
+    <title>VIP Manager • Pro</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap');
 
         :root {
-            --bg: #0a0a0b;
-            --card-bg: #111114;
-            --input-bg: #050505;
-            --accent: #00ff88;
-            --accent-glow: rgba(0, 255, 136, 0.3);
-            --text-main: #ffffff;
-            --text-dim: #666670;
-            --text-muted: #a0a0ab;
+            --bg: #050505;
+            --card-bg: #0f0f12;
+            --accent-green: #00ff88;
+            --accent-warn: #ffcc00;
+            --accent-error: #ff4444;
+            --text-dim: #55555e;
         }
 
         body {
             background-color: var(--bg);
-            color: var(--text-main);
+            color: #fff;
             font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            /* Background sutil para o efeito de vidro */
+            background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
         }
 
         .card {
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: 24px;
+            padding: 35px;
+            border-radius: 30px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            width: 320px;
-            border: 1px solid #1f1f23;
-            /* Ajuste para não cortar conteúdo */
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            width: 340px;
+            border: 1px solid #222;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            transition: all 0.3s ease;
         }
 
-        .hoje {
-            color: var(--text-dim);
-            font-size: 0.7rem;
+        .hoje-status {
+            font-size: 0.65rem;
             letter-spacing: 2px;
+            color: var(--text-dim);
             font-weight: 700;
+            margin-bottom: 25px;
             text-transform: uppercase;
         }
+
+        .hoje-status span { color: #888; }
 
         input[type="date"] {
             width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 2px solid #1f1f23;
-            background: var(--input-bg);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid #1a1a1e;
+            background: #000;
             color: #fff;
-            font-size: 1rem;
+            font-size: 1.1rem;
             outline: none;
             cursor: pointer;
-            font-family: inherit;
+            transition: 0.3s;
             box-sizing: border-box;
+            font-family: inherit;
         }
 
-        /* FORÇAR ÍCONE DO CALENDÁRIO A APARECER */
         input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.5;
             cursor: pointer;
-            filter: invert(1) brightness(0.8); /* Deixa o ícone branco/cinza */
-            padding: 5px;
         }
 
-        input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
+        input:focus { border-color: #444; }
+
+        .display-container {
+            margin-top: 25px;
+            padding: 25px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.03);
         }
 
-        .resultado {
-            min-height: 140px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0,0,0,0.15);
-            border-radius: 16px;
-        }
-
-        .label-status {
-            color: var(--text-dim);
+        .label {
             font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 1px;
         }
 
-        .numero-dias {
-            font-size: 4.5rem;
+        .num {
+            font-size: 5.5rem;
             font-weight: 900;
-            color: var(--accent);
-            text-shadow: 0 0 20px var(--accent-glow);
             line-height: 1;
             margin: 10px 0;
+            transition: 0.3s;
         }
 
+        /* Cores Dinâmicas */
+        .color-safe { color: var(--accent-green); text-shadow: 0 0 25px rgba(0, 255, 136, 0.3); }
+        .color-warn { color: var(--accent-warn); text-shadow: 0 0 25px rgba(255, 204, 0, 0.3); }
+        .color-expired { color: var(--accent-error); text-shadow: 0 0 25px rgba(255, 68, 68, 0.3); }
+
         .btn-copy {
-            background: #1f1f23;
-            border: 1px solid #2f2f35;
-            color: var(--text-muted);
-            padding: 8px 16px;
-            border-radius: 8px;
+            background: #1a1a1e;
+            border: 1px solid #333;
+            color: #999;
+            padding: 10px 25px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 15px;
             transition: 0.2s;
+            text-transform: uppercase;
         }
 
         .btn-copy:hover {
-            background: var(--accent);
+            background: #fff;
             color: #000;
-            border-color: var(--accent);
+            transform: translateY(-2px);
         }
 
-        #copyMsg {
-            color: var(--accent);
-            font-size: 0.65rem;
-            height: 15px;
-            margin-top: 5px;
-            opacity: 0;
-        }
+        .btn-copy:active { transform: translateY(0); }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="hoje">HOJE: <span id="displayHoje" style="color:var(--text-muted)"></span></div>
+    <div class="hoje-status">STAFF PANEL • <span id="dataAtual"></span></div>
     
     <input type="date" id="dataFim">
 
-    <div class="resultado" id="res">
-        <span style="color: #333; font-size: 0.8rem; font-weight: 700;">ESCOLHA UMA DATA</span>
+    <div id="displayArea" style="display: none;">
+        <div class="display-container">
+            <div class="label" id="topLabel">RESTAM</div>
+            <div class="num" id="resultadoNum">0</div>
+            <div class="label">DIAS</div>
+        </div>
+        <button class="btn-copy" id="btnCopiar" onclick="copy()">Copiar Número</button>
     </div>
-    
-    <div id="copyMsg">COPIADO!</div>
 </div>
 
 <script>
     const input = document.getElementById('dataFim');
-    const res = document.getElementById('res');
-    const hoje = new Date();
-    
-    document.getElementById('displayHoje').innerText = hoje.toLocaleDateString('pt-BR');
+    const displayArea = document.getElementById('displayArea');
+    const resultadoNum = document.getElementById('resultadoNum');
+    const topLabel = document.getElementById('topLabel');
+    const btnCopiar = document.getElementById('btnCopiar');
+
+    document.getElementById('dataAtual').innerText = new Date().toLocaleDateString('pt-BR');
 
     input.addEventListener('input', () => {
         if(!input.value) return;
-
-        const [ano, mes, dia] = input.value.split('-');
-        const dataFinal = new Date(ano, mes - 1, dia);
-        const dataHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
         
-        const diffDias = Math.ceil((dataFinal - dataHoje) / (1000 * 60 * 60 * 24));
+        const [ano, mes, dia] = input.value.split('-');
+        const dataFim = new Date(ano, mes - 1, dia);
+        const hoje = new Date();
+        hoje.setHours(0,0,0,0);
 
-        if (diffDias >= 0) {
-            res.innerHTML = `
-                <span class="label-status">RESTAM</span>
-                <span class="numero-dias">${diffDias}</span>
-                <span class="label-status">DIAS</span>
-                <button class="btn-copy" onclick="copyToClipboard('${diffDias}')" style="margin-top:15px">Copiar</button>
-            `;
+        const diff = Math.ceil((dataFim - hoje) / (86400000));
+        
+        displayArea.style.display = 'block';
+        resultadoNum.innerText = Math.abs(diff);
+        
+        // Lógica de Cores
+        resultadoNum.classList.remove('color-safe', 'color-warn', 'color-expired');
+        
+        if (diff > 3) {
+            resultadoNum.classList.add('color-safe');
+            topLabel.innerText = "RESTAM";
+        } else if (diff >= 0) {
+            resultadoNum.classList.add('color-warn');
+            topLabel.innerText = "EXPIRA LOGO";
         } else {
-            res.innerHTML = `<span style="color: #ff4444; font-weight: 900;">EXPIRADO</span>`;
+            resultadoNum.classList.add('color-expired');
+            topLabel.innerText = "VENCIDO HÁ";
         }
     });
 
-    function copyToClipboard(val) {
-        navigator.clipboard.writeText(val).then(() => {
-            const msg = document.getElementById('copyMsg');
-            msg.style.opacity = '1';
-            setTimeout(() => { msg.style.opacity = '0'; }, 2000);
-        });
+    function copy() {
+        navigator.clipboard.writeText(resultadoNum.innerText);
+        const originalText = btnCopiar.innerText;
+        btnCopiar.innerText = "COPIADO! ✓";
+        btnCopiar.style.borderColor = "#00ff88";
+        btnCopiar.style.color = "#00ff88";
+        
+        setTimeout(() => {
+            btnCopiar.innerText = originalText;
+            btnCopiar.style.borderColor = "#333";
+            btnCopiar.style.color = "#999";
+        }, 1500);
     }
 </script>
 
