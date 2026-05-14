@@ -14,6 +14,12 @@
             --accent-warn: #ffcc00;
             --accent-error: #ff4444;
             --text-dim: #55555e;
+            
+            /* Cores dos Planos */
+            --c-bronze: #cd7f32;
+            --c-prata: #c0c0c0;
+            --c-ouro: #ffd700;
+            --c-diamante: #00ffff;
         }
 
         body {
@@ -32,33 +38,62 @@
 
         .card {
             background: var(--card-bg);
-            padding: 40px 30px;
+            padding: 30px;
             border-radius: 30px;
-            text-align: center;
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             border: 1px solid #222;
             box-shadow: 0 30px 60px rgba(0,0,0,0.8);
             transition: all 0.3s ease;
         }
 
         @media (max-width: 480px) {
-            .card {
-                padding: 30px 20px;
-                border-radius: 20px;
-            }
-            .num {
-                font-size: 4.5rem !important;
-            }
-            input[type="date"], .custom-placeholder {
-                font-size: 1.1rem !important;
-            }
-            input[type="date"] {
-                padding: 18px !important;
-            }
-            .custom-placeholder {
-                left: 20px !important; /* Ajuste para acompanhar o padding maior no mobile */
-            }
+            .card { padding: 25px 15px; border-radius: 20px; }
+            .num { font-size: 4rem !important; }
+            .plan-grid { grid-template-columns: 1fr !important; } /* Planos ficam em 1 coluna no celular */
+        }
+
+        /* NAVEGAÇÃO DAS ABAS */
+        .tabs-nav {
+            display: flex;
+            background: #1a1a1e;
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            color: var(--text-dim);
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .hoje-status {
@@ -66,17 +101,16 @@
             letter-spacing: 2px;
             color: var(--text-dim);
             font-weight: 700;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-transform: uppercase;
+            text-align: center;
         }
 
-        /* TRUQUE DEFINITIVO PARA O MOBILE */
-        .input-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        input[type="date"] {
+        /* ESTILOS COMUNS DE INPUTS */
+        .input-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px;}
+        .input-wrapper { position: relative; flex: 1; }
+        
+        input[type="date"], input[type="number"] {
             width: 100%;
             padding: 15px;
             border-radius: 15px;
@@ -92,165 +126,320 @@
             color-scheme: dark; 
         }
 
-        /* 1. Deixa o texto nativo "bugado" do celular invisível quando vazio */
-        input[type="date"]:invalid::-webkit-datetime-edit {
-            color: transparent;
-        }
-
-        /* 2. Cria o nosso próprio placeholder que funciona em qualquer tela */
+        input[type="number"] { cursor: text; }
+        input[type="date"]:invalid::-webkit-datetime-edit { color: transparent; }
+        
         .custom-placeholder {
-            position: absolute;
-            left: 17px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888; /* Cor cinza simulando o placeholder */
-            pointer-events: none; /* Permite que o clique atravesse o texto e abra o calendário */
-            font-size: 1rem;
-            font-family: inherit;
+            position: absolute; left: 17px; top: 50%; transform: translateY(-50%);
+            color: #888; pointer-events: none; font-size: 0.95rem; font-family: inherit;
         }
 
-        /* 3. Esconde o nosso texto customizado quando uma data é escolhida */
-        input[type="date"]:valid + .custom-placeholder {
-            display: none;
-        }
-
-        /* 4. Força a data escolhida a aparecer na cor branca */
-        input[type="date"]:valid::-webkit-datetime-edit {
-            color: #fff;
-        }
-
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            opacity: 0.7;
-            cursor: pointer;
-        }
-
+        input[type="date"]:valid + .custom-placeholder { display: none; }
+        input[type="date"]:valid::-webkit-datetime-edit { color: #fff; }
+        input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.7; cursor: pointer; }
         input:focus { border-color: #444; }
 
+        /* BOTÕES DA ABA DE TRANSFERÊNCIA */
+        .btn-add {
+            background: transparent; border: 1px dashed #333; color: var(--text-dim);
+            padding: 15px; border-radius: 15px; width: 100%; margin-top: 5px;
+            cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-add:hover { border-color: var(--accent-green); color: var(--accent-green); background: rgba(0, 255, 136, 0.05); }
+        .btn-remove {
+            background: #1a1a1e; border: 1px solid #333; color: var(--accent-error);
+            width: 50px; height: 50px; border-radius: 15px; cursor: pointer; font-weight: bold;
+            font-size: 1.2rem; transition: 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-remove:hover { background: #3a1010; border-color: var(--accent-error); color: #fff; }
+
+        /* GRID DE PLANOS (NOVO VIP) */
+        .plan-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .plan-card {
+            background: #111;
+            border: 2px solid #1a1a1e;
+            border-radius: 15px;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .plan-card:hover { background: #1a1a1a; }
+        .plan-card.active { background: #1a1a1e; }
+
+        .plan-icon { font-size: 1.8rem; margin-bottom: 5px; }
+        .plan-name { font-weight: 900; font-size: 1rem; text-transform: uppercase; }
+        .plan-price { font-size: 0.75rem; color: #888; margin-top: 2px; }
+        .plan-days { font-size: 0.7rem; font-weight: 600; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; margin-top: 8px; }
+
+        /* Cores específicas dos planos */
+        .plan-bronze.active { border-color: var(--c-bronze); box-shadow: 0 0 15px rgba(205, 127, 50, 0.2); }
+        .plan-bronze .plan-name { color: var(--c-bronze); }
+        
+        .plan-prata.active { border-color: var(--c-prata); box-shadow: 0 0 15px rgba(192, 192, 192, 0.2); }
+        .plan-prata .plan-name { color: var(--c-prata); }
+
+        .plan-ouro.active { border-color: var(--c-ouro); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        .plan-ouro .plan-name { color: var(--c-ouro); }
+
+        .plan-diamante.active { border-color: var(--c-diamante); box-shadow: 0 0 15px rgba(0, 255, 255, 0.2); }
+        .plan-diamante .plan-name { color: var(--c-diamante); }
+
+        .divisor {
+            text-align: center; color: var(--text-dim); font-size: 0.7rem; font-weight: 600;
+            margin: 15px 0; text-transform: uppercase; letter-spacing: 2px;
+            display: flex; align-items: center;
+        }
+        .divisor::before, .divisor::after { content: ""; flex: 1; border-bottom: 1px dashed #333; margin: 0 10px; }
+
+        /* ÁREA DE RESULTADO GERAL */
         .display-container {
-            margin-top: 25px;
-            padding: 25px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.03);
+            margin-top: 20px; padding: 25px; background: rgba(0,0,0,0.3);
+            border-radius: 20px; border: 1px solid rgba(255,255,255,0.03); text-align: center;
         }
-
-        .label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-dim);
-            letter-spacing: 1px;
-        }
-
-        .num {
-            font-size: 6rem;
-            font-weight: 900;
-            line-height: 1;
-            margin: 10px 0;
-            transition: 0.3s;
-        }
-
-        .color-safe { color: var(--accent-green); text-shadow: 0 0 25px rgba(0, 255, 136, 0.3); }
-        .color-warn { color: var(--accent-warn); text-shadow: 0 0 25px rgba(255, 204, 0, 0.3); }
-        .color-expired { color: var(--accent-error); text-shadow: 0 0 25px rgba(255, 68, 68, 0.3); }
+        .label { font-size: 0.8rem; font-weight: 600; color: var(--text-dim); letter-spacing: 1px; }
+        .num { font-size: 5rem; font-weight: 900; line-height: 1; margin: 10px 0; transition: 0.3s; color: var(--accent-green); text-shadow: 0 0 25px rgba(0, 255, 136, 0.3); }
+        
+        .new-date-box { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #333; font-size: 0.8rem; color: var(--text-dim); font-weight: 600; letter-spacing: 1px; }
+        .new-date-box span { display: block; margin-top: 5px; font-size: 1.3rem; color: #fff; font-weight: 900; }
 
         .btn-copy {
-            background: #1a1a1e;
-            border: 1px solid #333;
-            color: #999;
-            padding: 15px 30px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-top: 20px;
-            transition: 0.2s;
-            text-transform: uppercase;
-            width: 100%;
+            background: #1a1a1e; border: 1px solid #333; color: #999; padding: 15px 30px;
+            border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600;
+            margin-top: 15px; transition: 0.2s; text-transform: uppercase; width: 100%;
         }
+        .btn-copy:hover { background: #fff; color: #000; }
+        .msgStatus { margin-top: 10px; font-size: 0.7rem; font-weight: bold; height: 15px; transition: 0.3s; text-align: center; }
 
-        .btn-copy:hover {
-            background: #fff;
-            color: #000;
-        }
-
-        #msgStatus {
-            margin-top: 10px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            height: 15px;
-            transition: 0.3s;
-        }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="hoje-status">STAFF PANEL • <span id="dataAtual"></span></div>
-    
-    <div class="input-wrapper">
-        <input type="date" id="dataFim" required>
-        <span class="custom-placeholder">dd/mm/aaaa</span>
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('tab-novo', this)">Novo VIP</button>
+        <button class="tab-btn" onclick="switchTab('tab-transf', this)">Transferir / Somar</button>
     </div>
 
-    <div id="displayArea" style="display: none;">
-        <div class="display-container">
-            <div class="label" id="topLabel">RESTAM</div>
-            <div class="num" id="resultadoNum">0</div>
-            <div class="label">DIAS</div>
+    <div class="hoje-status">HOJE: <span id="dataAtual"></span></div>
+
+    <div id="tab-novo" class="tab-content active">
+        
+        <div class="plan-grid">
+            <div class="plan-card plan-bronze" onclick="selecionarPlano('Bronze', 7, this)">
+                <div class="plan-icon">🥉</div>
+                <div class="plan-name">Bronze</div>
+                <div class="plan-price">R$ 4,99</div>
+                <div class="plan-days">+7 Dias</div>
+            </div>
+            <div class="plan-card plan-prata" onclick="selecionarPlano('Prata', 30, this)">
+                <div class="plan-icon">🥈</div>
+                <div class="plan-name">Prata</div>
+                <div class="plan-price">R$ 7,99</div>
+                <div class="plan-days">+30 Dias</div>
+            </div>
+            <div class="plan-card plan-ouro" onclick="selecionarPlano('Ouro', 90, this)">
+                <div class="plan-icon">🥇</div>
+                <div class="plan-name">Ouro</div>
+                <div class="plan-price">R$ 23,99</div>
+                <div class="plan-days">+90 Dias</div>
+            </div>
+            <div class="plan-card plan-diamante" onclick="selecionarPlano('Diamante', 365, this)">
+                <div class="plan-icon">💎</div>
+                <div class="plan-name">Diamante</div>
+                <div class="plan-price">R$ 79,99</div>
+                <div class="plan-days">+365 Dias</div>
+            </div>
         </div>
-        <button class="btn-copy" id="btnCopiar" onclick="copy()">Copiar Número</button>
-        <div id="msgStatus"></div>
+
+        <div class="divisor">OU</div>
+
+        <div class="input-wrapper">
+            <input type="number" id="customDaysInput" placeholder="Adicionar dias manualmente..." min="1" oninput="calcularCustomizado()">
+        </div>
+
+        <div id="displayNovo" style="display: none;">
+            <div class="display-container">
+                <div class="label" id="labelPlanoInfo">PLANO SELECIONADO</div>
+                <div class="num" id="resDiasNovo">0</div>
+                <div class="new-date-box">
+                    VÁLIDO ATÉ
+                    <span id="dataFinalNovo">--/--/----</span>
+                </div>
+            </div>
+            <button class="btn-copy" onclick="copyResumoNovo()">Copiar p/ Ticket</button>
+            <div class="msgStatus" id="msgNovo"></div>
+        </div>
+    </div>
+
+    <div id="tab-transf" class="tab-content">
+        <div id="inputsContainer">
+            <div class="input-row">
+                <div class="input-wrapper">
+                    <input type="date" class="vip-date" required>
+                    <span class="custom-placeholder">Data fim (Conta Principal)</span>
+                </div>
+            </div>
+        </div>
+        <button class="btn-add" id="btnAddConta">+ Adicionar Conta Secundária</button>
+
+        <div id="displayTransf" style="display: none;">
+            <div class="display-container">
+                <div class="label" id="topLabelTransf">TOTAL DE DIAS UNIFICADOS</div>
+                <div class="num" id="resultadoNumTransf">0</div>
+                <div class="new-date-box">
+                    NOVA DATA DA CONTA
+                    <span id="textoNovaDataTransf">--/--/----</span>
+                </div>
+            </div>
+            <button class="btn-copy" onclick="copyResumoTransf()">Copiar Resumo</button>
+            <div class="msgStatus" id="msgTransf"></div>
+        </div>
     </div>
 </div>
 
 <script>
-    const input = document.getElementById('dataFim');
-    const displayArea = document.getElementById('displayArea');
-    const resultadoNum = document.getElementById('resultadoNum');
-    const topLabel = document.getElementById('topLabel');
-    const btnCopiar = document.getElementById('btnCopiar');
-    const msgStatus = document.getElementById('msgStatus');
+    // DATA GLOBAL
+    const dataBase = new Date();
+    dataBase.setHours(0,0,0,0);
+    document.getElementById('dataAtual').innerText = dataBase.toLocaleDateString('pt-BR');
 
-    document.getElementById('dataAtual').innerText = new Date().toLocaleDateString('pt-BR');
+    // === SISTEMA DE ABAS ===
+    function switchTab(tabId, btnElement) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        btnElement.classList.add('active');
+    }
 
-    input.addEventListener('input', () => {
-        if(!input.value) {
-            displayArea.style.display = 'none';
+    // === LÓGICA DA ABA: NOVO VIP ===
+    let planoAtualNovo = "";
+    let diasAtualNovo = 0;
+
+    function formatarDataSoma(dias) {
+        const novaData = new Date(dataBase);
+        novaData.setDate(novaData.getDate() + dias);
+        return novaData.toLocaleDateString('pt-BR');
+    }
+
+    function selecionarPlano(nome, dias, elementoCard) {
+        // Limpa visual dos cards e input customizado
+        document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'));
+        document.getElementById('customDaysInput').value = '';
+        
+        // Ativa card clicado
+        elementoCard.classList.add('active');
+        
+        planoAtualNovo = nome;
+        diasAtualNovo = dias;
+        
+        atualizarDisplayNovo(nome);
+    }
+
+    function calcularCustomizado() {
+        const inputValor = parseInt(document.getElementById('customDaysInput').value);
+        document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'));
+
+        if (!inputValor || inputValor <= 0) {
+            document.getElementById('displayNovo').style.display = 'none';
             return;
         }
-        
-        const [ano, mes, dia] = input.value.split('-');
-        const dataFim = new Date(ano, mes - 1, dia);
-        const hoje = new Date();
-        hoje.setHours(0,0,0,0);
 
-        const diff = Math.ceil((dataFim - hoje) / (86400000));
+        planoAtualNovo = "Personalizado";
+        diasAtualNovo = inputValor;
+        atualizarDisplayNovo("Dias Manuais");
+    }
+
+    function atualizarDisplayNovo(textoLabel) {
+        document.getElementById('displayNovo').style.display = 'block';
+        document.getElementById('labelPlanoInfo').innerText = `PLANO: ${textoLabel.toUpperCase()}`;
+        document.getElementById('resDiasNovo').innerText = diasAtualNovo;
+        document.getElementById('dataFinalNovo').innerText = formatarDataSoma(diasAtualNovo);
+    }
+
+    function copyResumoNovo() {
+        const df = document.getElementById('dataFinalNovo').innerText;
+        const txt = `✅ **VIP Ativado com Sucesso!**\nPlano: **${planoAtualNovo}** (${diasAtualNovo} dias)\nVálido até: **${df}**\n\n*Aproveite as vantagens do seu plano!*`;
+        navigator.clipboard.writeText(txt);
         
-        displayArea.style.display = 'block';
-        resultadoNum.innerText = Math.abs(diff);
-        
-        resultadoNum.classList.remove('color-safe', 'color-warn', 'color-expired');
-        
-        if (diff > 3) {
-            resultadoNum.classList.add('color-safe');
-            topLabel.innerText = "RESTAM";
-        } else if (diff >= 0) {
-            resultadoNum.classList.add('color-warn');
-            topLabel.innerText = "EXPIRA LOGO";
-        } else {
-            resultadoNum.classList.add('color-expired');
-            topLabel.innerText = "VENCIDO HÁ";
+        const msg = document.getElementById('msgNovo');
+        msg.innerText = "COPIADO PARA O TICKET!";
+        msg.style.color = "#00ff88";
+        setTimeout(() => msg.innerText = "", 2500);
+    }
+
+
+    // === LÓGICA DA ABA: TRANSFERIR / SOMAR (Antiga) ===
+    const inputsContainer = document.getElementById('inputsContainer');
+    const displayTransf = document.getElementById('displayTransf');
+    const resultadoNumTransf = document.getElementById('resultadoNumTransf');
+    const textoNovaDataTransf = document.getElementById('textoNovaDataTransf');
+    let contadorContas = 1;
+
+    function calcularTransferencia() {
+        const inputs = document.querySelectorAll('.vip-date');
+        let totalDiasVip = 0;
+        let temData = false;
+
+        inputs.forEach(input => {
+            if(input.value) {
+                temData = true;
+                const [ano, mes, dia] = input.value.split('-');
+                const dataFim = new Date(ano, mes - 1, dia);
+                const diff = Math.ceil((dataFim - dataBase) / 86400000);
+                if (diff > 0) totalDiasVip += diff;
+            }
+        });
+
+        if (!temData) {
+            displayTransf.style.display = 'none';
+            return;
         }
+
+        displayTransf.style.display = 'block';
+        resultadoNumTransf.innerText = totalDiasVip;
+        textoNovaDataTransf.innerText = formatarDataSoma(totalDiasVip);
+    }
+
+    inputsContainer.addEventListener('input', calcularTransferencia);
+
+    document.getElementById('btnAddConta').addEventListener('click', () => {
+        contadorContas++;
+        const row = document.createElement('div');
+        row.className = 'input-row';
+        row.innerHTML = `
+            <div class="input-wrapper">
+                <input type="date" class="vip-date" required>
+                <span class="custom-placeholder">Data fim (Conta ${contadorContas})</span>
+            </div>
+            <button class="btn-remove" onclick="this.parentElement.remove(); calcularTransferencia();">×</button>
+        `;
+        inputsContainer.appendChild(row);
     });
 
-    function copy() {
-        navigator.clipboard.writeText(resultadoNum.innerText);
-        msgStatus.innerText = "NÚMERO COPIADO!";
-        msgStatus.style.color = "#00ff88";
+    function copyResumoTransf() {
+        const dias = resultadoNumTransf.innerText;
+        const dataF = textoNovaDataTransf.innerText;
+        const txt = `🔄 **Unificação de Contas VIP concluída**\nTotal de dias convertidos: **${dias} dias**\nNova data de expiração: **${dataF}**`;
+        navigator.clipboard.writeText(txt);
         
-        setTimeout(() => {
-            msgStatus.innerText = "";
-        }, 2000);
+        const msg = document.getElementById('msgTransf');
+        msg.innerText = "RESUMO COPIADO!";
+        msg.style.color = "#00ff88";
+        setTimeout(() => msg.innerText = "", 2500);
     }
 </script>
 
