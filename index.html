@@ -50,7 +50,7 @@
         @media (max-width: 480px) {
             .card { padding: 25px 15px; border-radius: 20px; }
             .num { font-size: 4rem !important; }
-            .plan-grid { grid-template-columns: 1fr !important; } /* Planos ficam em 1 coluna no celular */
+            .plan-grid { grid-template-columns: 1fr !important; }
         }
 
         /* NAVEGAÇÃO DAS ABAS */
@@ -184,7 +184,6 @@
         .plan-price { font-size: 0.75rem; color: #888; margin-top: 2px; }
         .plan-days { font-size: 0.7rem; font-weight: 600; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; margin-top: 8px; }
 
-        /* Cores específicas dos planos */
         .plan-bronze.active { border-color: var(--c-bronze); box-shadow: 0 0 15px rgba(205, 127, 50, 0.2); }
         .plan-bronze .plan-name { color: var(--c-bronze); }
         
@@ -304,7 +303,7 @@
                     <span id="textoNovaDataTransf">--/--/----</span>
                 </div>
             </div>
-            <button class="btn-copy" onclick="copyResumoTransf()">Copiar Resumo</button>
+            <button class="btn-copy" onclick="copyResumoTransf()">Copiar Resumo Detalhado</button>
             <div class="msgStatus" id="msgTransf"></div>
         </div>
     </div>
@@ -336,16 +335,12 @@
     }
 
     function selecionarPlano(nome, dias, elementoCard) {
-        // Limpa visual dos cards e input customizado
         document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'));
         document.getElementById('customDaysInput').value = '';
-        
-        // Ativa card clicado
         elementoCard.classList.add('active');
         
         planoAtualNovo = nome;
         diasAtualNovo = dias;
-        
         atualizarDisplayNovo(nome);
     }
 
@@ -382,7 +377,7 @@
     }
 
 
-    // === LÓGICA DA ABA: TRANSFERIR / SOMAR (Antiga) ===
+    // === LÓGICA DA ABA: TRANSFERIR / SOMAR ===
     const inputsContainer = document.getElementById('inputsContainer');
     const displayTransf = document.getElementById('displayTransf');
     const resultadoNumTransf = document.getElementById('resultadoNumTransf');
@@ -430,16 +425,43 @@
         inputsContainer.appendChild(row);
     });
 
+    // Função NOVA de cópia detalhada
     function copyResumoTransf() {
-        const dias = resultadoNumTransf.innerText;
-        const dataF = textoNovaDataTransf.innerText;
-        const txt = `🔄 **Unificação de Contas VIP concluída**\nTotal de dias convertidos: **${dias} dias**\nNova data de expiração: **${dataF}**`;
-        navigator.clipboard.writeText(txt);
+        const inputs = document.querySelectorAll('.vip-date');
+        const hojeStr = dataBase.toLocaleDateString('pt-BR');
+        let detalhesContas = '';
+        let indexContaReal = 1;
+
+        inputs.forEach((input) => {
+            if(input.value) {
+                const [ano, mes, dia] = input.value.split('-');
+                const dataFim = new Date(ano, mes - 1, dia);
+                const diff = Math.ceil((dataFim - dataBase) / 86400000);
+                const fimStr = dataFim.toLocaleDateString('pt-BR');
+                
+                if (diff > 0) {
+                    detalhesContas += `• **Conta ${indexContaReal}:** ${hojeStr} até ${fimStr} ➔ **${diff} dias**\n`;
+                } else {
+                    detalhesContas += `• **Conta ${indexContaReal}:** ${hojeStr} até ${fimStr} ➔ **Expirado (0 dias)**\n`;
+                }
+                indexContaReal++;
+            }
+        });
+
+        const diasTotais = resultadoNumTransf.innerText;
+        const dataFinal = textoNovaDataTransf.innerText;
+        
+        const textoParaCopiar = `🔄 **Unificação de Contas VIP concluída**\n\n${detalhesContas}\n**Total Unificado:** ${diasTotais} dias\n**Data Final do VIP:** ${dataFinal}`;
+        
+        navigator.clipboard.writeText(textoParaCopiar);
         
         const msg = document.getElementById('msgTransf');
-        msg.innerText = "RESUMO COPIADO!";
+        msg.innerText = "RESUMO DETALHADO COPIADO!";
         msg.style.color = "#00ff88";
-        setTimeout(() => msg.innerText = "", 2500);
+        
+        setTimeout(() => {
+            msg.innerText = "";
+        }, 3000);
     }
 </script>
 
