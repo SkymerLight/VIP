@@ -15,6 +15,7 @@
             --accent-error: #ff4444;
             --text-dim: #55555e;
             
+            /* Cores dos Planos */
             --c-bronze: #cd7f32;
             --c-prata: #c0c0c0;
             --c-ouro: #ffd700;
@@ -130,7 +131,6 @@
         input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.7; cursor: pointer; }
         input:focus { border-color: #444; }
 
-        /* BOTÕES DA ABA DE TRANSFERÊNCIA */
         .btn-add {
             background: transparent; border: 1px dashed #333; color: var(--text-dim);
             padding: 15px; border-radius: 15px; width: 100%; margin-top: 5px;
@@ -211,19 +211,18 @@
         .btn-copy:hover { background: #fff; color: #000; }
         .msgStatus { margin-top: 10px; font-size: 0.7rem; font-weight: bold; height: 15px; transition: 0.3s; text-align: center; }
 
+
         @media (max-width: 480px) {
-            body { padding: 10px; } /* Menos espaço sobrando nas bordas da tela */
+            body { padding: 10px; }
             .card { padding: 20px 15px; border-radius: 20px; }
             .num { font-size: 3.5rem !important; }
             
-            /* Deixa tudo um pouco mais compacto pra caber sem rolar */
             .tabs-nav { margin-bottom: 15px; }
             .hoje-status { margin-bottom: 15px; }
             .display-container { padding: 15px; margin-top: 15px; }
             .new-date-box span { font-size: 1.1rem; }
             .btn-copy { padding: 12px 20px; font-size: 0.85rem; margin-top: 10px; }
             
-            /* Ajusta os cards 2x2 pra caberem perfeitamente no celular */
             .plan-card { padding: 10px 5px; }
             .plan-icon { font-size: 1.5rem; margin-bottom: 2px; }
             .plan-name { font-size: 0.85rem; }
@@ -373,7 +372,8 @@
 
     function copyResumoNovo() {
         const df = document.getElementById('dataFinalNovo').innerText;
-        const txt = `✅ **VIP Ativado com Sucesso!**\nPlano: **${planoAtualNovo}** (${diasAtualNovo} dias)\nVálido até: **${df}**\n\n*Aproveite as vantagens do seu plano!*`;
+        // Atualizado para o formato solicitado
+        const txt = `Confere la se está okay, Plano: **${planoAtualNovo}** (${diasAtualNovo} dias) Válido até: **${df}**`;
         navigator.clipboard.writeText(txt);
         
         const msg = document.getElementById('msgNovo');
