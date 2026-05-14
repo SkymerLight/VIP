@@ -15,6 +15,7 @@
             --accent-error: #ff4444;
             --text-dim: #55555e;
             
+            /* Cores dos Planos */
             --c-bronze: #cd7f32;
             --c-prata: #c0c0c0;
             --c-ouro: #ffd700;
@@ -105,6 +106,7 @@
             text-align: center;
         }
 
+        /* ESTILOS COMUNS DE INPUTS */
         .input-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px;}
         .input-wrapper { position: relative; flex: 1; }
         
@@ -137,6 +139,7 @@
         input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.7; cursor: pointer; }
         input:focus { border-color: #444; }
 
+        /* BOTÕES DA ABA DE TRANSFERÊNCIA */
         .btn-add {
             background: transparent; border: 1px dashed #333; color: var(--text-dim);
             padding: 15px; border-radius: 15px; width: 100%; margin-top: 5px;
@@ -151,6 +154,7 @@
         }
         .btn-remove:hover { background: #3a1010; border-color: var(--accent-error); color: #fff; }
 
+        /* GRID DE PLANOS (NOVO VIP) */
         .plan-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -306,10 +310,12 @@
 </div>
 
 <script>
+    // DATA GLOBAL
     const dataBase = new Date();
     dataBase.setHours(0,0,0,0);
     document.getElementById('dataAtual').innerText = dataBase.toLocaleDateString('pt-BR');
 
+    // === SISTEMA DE ABAS ===
     function switchTab(tabId, btnElement) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -318,6 +324,7 @@
         btnElement.classList.add('active');
     }
 
+    // === LÓGICA DA ABA: NOVO VIP ===
     let planoAtualNovo = "";
     let diasAtualNovo = 0;
 
@@ -418,6 +425,7 @@
         inputsContainer.appendChild(row);
     });
 
+    // Cópia ajustada com as quebras de linha certas e sem título
     function copyResumoTransf() {
         const inputs = document.querySelectorAll('.vip-date');
         const hojeStr = dataBase.toLocaleDateString('pt-BR');
@@ -443,7 +451,8 @@
         const diasTotais = resultadoNumTransf.innerText;
         const dataFinal = textoNovaDataTransf.innerText;
         
-        const textoParaCopiar = `🔄 **Unificação de Contas VIP concluída**\n\n${detalhesContas}\n**Total Unificado:** ${diasTotais} dias\n**Data Final do VIP:** ${dataFinal}`;
+        // Formato final limpo e com as quebras de linha nativas
+        const textoParaCopiar = `${detalhesContas}**Total:** ${diasTotais} dias\n**Data Final do VIP:** ${dataFinal}`;
         
         navigator.clipboard.writeText(textoParaCopiar);
         
