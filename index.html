@@ -53,6 +53,7 @@
             border-radius: 15px;
             padding: 5px;
             margin-bottom: 25px;
+            gap: 2px;
         }
 
         .tab-btn {
@@ -60,10 +61,10 @@
             background: transparent;
             color: var(--text-dim);
             border: none;
-            padding: 12px;
+            padding: 12px 5px;
             border-radius: 12px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: 0.3s;
             text-transform: uppercase;
@@ -199,6 +200,7 @@
         }
         .label { font-size: 0.8rem; font-weight: 600; color: var(--text-dim); letter-spacing: 1px; }
         .num { font-size: 5rem; font-weight: 900; line-height: 1; margin: 10px 0; transition: 0.3s; color: var(--accent-green); text-shadow: 0 0 25px rgba(0, 255, 136, 0.3); }
+        .num-small { font-size: 3rem !important; } /* Usado na nova aba de renovar */
         
         .new-date-box { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #333; font-size: 0.8rem; color: var(--text-dim); font-weight: 600; letter-spacing: 1px; }
         .new-date-box span { display: block; margin-top: 5px; font-size: 1.3rem; color: #fff; font-weight: 900; }
@@ -216,8 +218,11 @@
             body { padding: 10px; }
             .card { padding: 20px 15px; border-radius: 20px; }
             .num { font-size: 3.5rem !important; }
+            .num-small { font-size: 2.5rem !important; }
             
             .tabs-nav { margin-bottom: 15px; }
+            .tab-btn { font-size: 0.65rem; padding: 10px 2px; } /* Ajuste pra caber as 3 abas sem esmagar */
+            
             .hoje-status { margin-bottom: 15px; }
             .display-container { padding: 15px; margin-top: 15px; }
             .new-date-box span { font-size: 1.1rem; }
@@ -237,7 +242,8 @@
 <div class="card">
     <div class="tabs-nav">
         <button class="tab-btn active" onclick="switchTab('tab-novo', this)">Novo VIP</button>
-        <button class="tab-btn" onclick="switchTab('tab-transf', this)">Transferir / Somar</button>
+        <button class="tab-btn" onclick="switchTab('tab-renovar', this)">Renovar VIP</button>
+        <button class="tab-btn" onclick="switchTab('tab-transf', this)">Transferir</button>
     </div>
 
     <div class="hoje-status">HOJE: <span id="dataAtual"></span></div>
@@ -291,6 +297,30 @@
         </div>
     </div>
 
+    <div id="tab-renovar" class="tab-content">
+        <div class="input-row">
+            <div class="input-wrapper">
+                <input type="date" id="dataAtualVipRenovacao" required>
+                <span class="custom-placeholder">Data Final Atual</span>
+            </div>
+        </div>
+        <div class="input-wrapper" style="margin-bottom: 10px;">
+            <input type="number" id="diasAddRenovacao" placeholder="Dias para adicionar (ex: 30)" min="1">
+        </div>
+
+        <div id="displayRenovar" style="display: none;">
+            <div class="display-container">
+                <div class="label">NOVA DATA DE EXPIRAÇÃO</div>
+                <div class="num num-small" id="resDataNovaRenovacao">--/--/----</div>
+                <div class="new-date-box" style="border-top: none; padding-top: 0; margin-top: 0;">
+                    <span style="font-size: 0.9rem; color: var(--text-dim); font-weight: normal;">Foram adicionados <b id="txtDiasAddRenovacao" style="color: #fff;">0</b> dias.</span>
+                </div>
+            </div>
+            <button class="btn-copy" onclick="copyResumoRenovar()">Copiar Resumo</button>
+            <div class="msgStatus" id="msgRenovar"></div>
+        </div>
+    </div>
+
     <div id="tab-transf" class="tab-content">
         <div id="inputsContainer">
             <div class="input-row">
@@ -330,6 +360,9 @@
         btnElement.classList.add('active');
     }
 
+    // ==========================================
+    // LÓGICA: NOVO VIP
+    // ==========================================
     let planoAtualNovo = "";
     let diasAtualNovo = 0;
 
@@ -372,7 +405,6 @@
 
     function copyResumoNovo() {
         const df = document.getElementById('dataFinalNovo').innerText;
-        // Atualizado para o formato solicitado
         const txt = `Confere lá se está okay, Plano: **${planoAtualNovo}** (${diasAtualNovo} dias) Válido até: **${df}**`;
         navigator.clipboard.writeText(txt);
         
@@ -382,7 +414,50 @@
         setTimeout(() => msg.innerText = "", 2500);
     }
 
+    // ==========================================
+    // LÓGICA: RENOVAR VIP (NOVA ABA)
+    // ==========================================
+    const inputDataAtualVipRenovacao = document.getElementById('dataAtualVipRenovacao');
+    const inputDiasAddRenovacao = document.getElementById('diasAddRenovacao');
+    const displayRenovar = document.getElementById('displayRenovar');
+    const resDataNovaRenovacao = document.getElementById('resDataNovaRenovacao');
+    const txtDiasAddRenovacao = document.getElementById('txtDiasAddRenovacao');
 
+    function calcularRenovacao() {
+        if(!inputDataAtualVipRenovacao.value || !inputDiasAddRenovacao.value || inputDiasAddRenovacao.value <= 0) {
+            displayRenovar.style.display = 'none';
+            return;
+        }
+
+        const [ano, mes, dia] = inputDataAtualVipRenovacao.value.split('-');
+        const dataFim = new Date(ano, mes - 1, dia);
+        const diasParaAdd = parseInt(inputDiasAddRenovacao.value);
+
+        dataFim.setDate(dataFim.getDate() + diasParaAdd);
+
+        displayRenovar.style.display = 'block';
+        resDataNovaRenovacao.innerText = dataFim.toLocaleDateString('pt-BR');
+        txtDiasAddRenovacao.innerText = diasParaAdd;
+    }
+
+    inputDataAtualVipRenovacao.addEventListener('input', calcularRenovacao);
+    inputDiasAddRenovacao.addEventListener('input', calcularRenovacao);
+
+    function copyResumoRenovar() {
+        const dataFinal = resDataNovaRenovacao.innerText;
+        const diasAdd = txtDiasAddRenovacao.innerText;
+        const txt = `✅ **Renovação de VIP concluída!**\nAdicionado: **${diasAdd} dias**\nNova data de expiração: **${dataFinal}**`;
+        navigator.clipboard.writeText(txt);
+        
+        const msg = document.getElementById('msgRenovar');
+        msg.innerText = "RESUMO DA RENOVAÇÃO COPIADO!";
+        msg.style.color = "#00ff88";
+        setTimeout(() => msg.innerText = "", 2500);
+    }
+
+    // ==========================================
+    // LÓGICA: TRANSFERIR (Antigo Transferir/Somar)
+    // ==========================================
     const inputsContainer = document.getElementById('inputsContainer');
     const displayTransf = document.getElementById('displayTransf');
     const resultadoNumTransf = document.getElementById('resultadoNumTransf');
@@ -423,7 +498,7 @@
         row.innerHTML = `
             <div class="input-wrapper">
                 <input type="date" class="vip-date" required>
-                <span class="custom-placeholder">Data fim (Conta ${contadorContas})</span>
+                <span class="custom-placeholder">Conta ${contadorContas}</span>
             </div>
             <button class="btn-remove" onclick="this.parentElement.remove(); calcularTransferencia();">×</button>
         `;
